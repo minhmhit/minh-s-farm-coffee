@@ -1,45 +1,21 @@
 <?php
-session_start();
 include '../includes/db.php';
-
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-
-    if (empty($email) || empty($password)) {
-        $error = "Vui lòng điền đầy đủ thông tin.";
-    } else {
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            if ($password === $user['password']) { // So sánh plain text
-                $_SESSION['user_id'] = $user['id'];
-                header("Location: index.php");
-                exit;
-            } else {
-                $error = "Mật khẩu không đúng.";
-            }
-        } else {
-            $error = "Email không tồn tại.";
-        }
-    }
-}
+// session_start();
 ?>
 
-<?php include '../includes/header.php'; ?>
+<?php include '../includes/header.php'; 
+if(!isset($_SESSION)) 
+{ 
+    session_start(); 
+} 
+?>
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card shadow">
             <div class="card-body">
                 <h2 class="card-title text-center">Đăng nhập</h2>
-                <?php if (isset($error)): ?>
-                    <div class="alert alert-danger"><?php echo $error; ?></div>
-                <?php endif; ?>
-                <form method="post" action="">
+                <div id="login-error" class="alert alert-danger d-none"></div>
+                <form id="login-form">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" required>

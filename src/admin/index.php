@@ -1,6 +1,10 @@
 <?php
-session_start();
 include '../includes/db.php';
+include '../includes/admin_header.php';
+if(!isset($_SESSION)) 
+{ 
+    session_start(); 
+} 
 
 if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
@@ -17,7 +21,6 @@ $product_count = $conn->query("SELECT COUNT(*) as total FROM products")->fetch_a
 $order_count = $conn->query("SELECT COUNT(*) as total FROM orders")->fetch_assoc()['total'];
 ?>
 
-<?php include '../includes/admin_header.php'; ?>
 <h2 class="text-center mb-4">Tổng quan Admin</h2>
 <div class="row">
     <div class="col-md-4">

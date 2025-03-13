@@ -1,5 +1,5 @@
 <?php
-session_start();
+include '../includes/admin_header.php';
 include '../includes/db.php';
 
 if (!isset($_SESSION['admin_id'])) {
@@ -11,7 +11,6 @@ if (!isset($_SESSION['admin_id'])) {
 $carts = $conn->query("SELECT c.*, u.name as user_name, p.name as product_name FROM cart c JOIN users u ON c.user_id = u.id JOIN products p ON c.product_id = p.id");
 ?>
 
-<?php include '../includes/admin_header.php'; ?>
 <h2 class="text-center mb-4">Quản lý Giỏ hàng</h2>
 
 <table class="table table-striped">
