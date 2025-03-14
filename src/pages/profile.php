@@ -1,38 +1,48 @@
 <?php
-include 'header.php';
 include '../includes/db.php';
+ include '../includes/header.php';
+if(!isset($_SESSION)) 
+{ 
+    session_start(); 
+} 
 
-if (!isset($_GET['id'])) {
-    header("Location: user.php");
+
+
+// Kiểm tra xem người dùng đã đăng nhập chưa
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
     exit;
 }
 
-$user_id = $_GET['id'];
+$user_id = $_SESSION['user_id'];
+// Lấy thông tin người dùng từ cơ sở dữ liệu
 $user = $conn->query("SELECT * FROM users WHERE id = $user_id")->fetch_assoc();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+// Xử lý cập nhật thông tin khi form được submit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $address = $_POST['address'];
     $phone = $_POST['phone'];
-
+    
+    // Chuẩn bị câu lệnh SQL để cập nhật thông tin
     $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, address = ?, phone = ? WHERE id = ?");
     $stmt->bind_param("ssssi", $name, $email, $address, $phone, $user_id);
+    
+    // Thực thi câu lệnh và kiểm tra kết quả
     if ($stmt->execute()) {
-        header("Location: user.php");
+        $_SESSION['user_name'] = $name;
+        header("Location: profile.php");
         exit;
     } else {
-        $error = "Cập nhật thất bại: " . $stmt->error;
+        echo "Lỗi: " . $stmt->error;
     }
 }
 ?>
 
-<h2 class="text-center mb-4">Sửa thông tin người dùng</h2>
+<h2 class="text-center mb-4">Cập nhật thông tin cá nhân</h2>
 <div class="card">
     <div class="card-body">
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
-        <?php endif; ?>
         <form method="post" action="">
             <div class="mb-3">
                 <label for="name" class="form-label">Họ và tên</label>
@@ -54,5 +64,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
     </div>
 </div>
-
-<?php include 'footer.php'; ?>
+<?php include '../includes/indexfooter.php'; ?>
